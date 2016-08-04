@@ -60,6 +60,7 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerQuickSwipeToggleVelocityKey
 FOUNDATION_EXTERN NSString * const PKRevealControllerDisablesFrontViewInteractionKey;
 FOUNDATION_EXTERN NSString * const PKRevealControllerRecognizesPanningOnFrontViewKey;
 FOUNDATION_EXTERN NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey;
+FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
 
 @protocol PKRevealing;
 
@@ -89,6 +90,9 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerRecognizesResetTapOnFrontVi
 
 /// Returns YES if either the left or right view controller are revealed to their max width.
 @property (nonatomic, readonly) BOOL isPresentationModeActive;
+
+/// Whether to allow the front controller to cast a shadow
+@property (nonatomic, assign) BOOL castsShadow;
 
 /// Contains the controllers configuration. Deprecated in favour of direct property manipulation.
 @property (nonatomic, readonly) NSDictionary *options __deprecated;
