@@ -51,7 +51,7 @@ NSString * const PKRevealControllerDisablesFrontViewInteractionKey = @"disablesF
 NSString * const PKRevealControllerRecognizesPanningOnFrontViewKey = @"recognizesPanningOnFrontView";
 NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"recognizesResetTapOnFrontView";
 NSString * const PKRevealControllerRecognizesResetTapOnFrontViewInPresentationModeKey = @"recognizesResetTapOnFrontViewInPresentationMode";
-NSString * const PKReavealControllerCastsShadowKey = @"castsShadow";
+NSString * const PKRevealControllerCastsShadowKey = @"castsShadow";
 
 static NSString *kPKRevealControllerFrontViewTranslationAnimationKey = @"frontViewTranslation";
 
