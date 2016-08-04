@@ -497,7 +497,7 @@ typedef struct
                       PKRevealControllerRecognizesPanningOnFrontViewKey,
                       PKRevealControllerRecognizesResetTapOnFrontViewKey,
                       PKRevealControllerRecognizesResetTapOnFrontViewInPresentationModeKey,
-                      PKReavealControllerCastsShadowKey];
+                      PKRevealControllerCastsShadowKey];
     
     return [self dictionaryWithValuesForKeys:keys];
 
