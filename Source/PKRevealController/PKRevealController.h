@@ -200,7 +200,7 @@ FOUNDATION_EXTERN NSString * _Nonnull const PKRevealControllerCastsShadowKey;
  
  @param frontViewController Thew new front view controller.
  */
-- (void)setFrontViewController:(UIViewController * _Nonnull)frontViewController;
+- (void)setFrontViewController:(UIViewController * _Nullable)frontViewController;
 
 /**
  Exchanges the current front view controller for a new one.
@@ -211,7 +211,7 @@ FOUNDATION_EXTERN NSString * _Nonnull const PKRevealControllerCastsShadowKey;
  @param focus Whether the front view controller's view animates back to its center position after it was set.
  @param completion Executed on the main thread after the show animation is completed.
  */
-- (void)setFrontViewController:(UIViewController * _Nonnull)frontViewController
+- (void)setFrontViewController:(UIViewController * _Nullable)frontViewController
               focusAfterChange:(BOOL)focus
                     completion:(PKDefaultCompletionHandler _Nullable)completion __deprecated;
 
@@ -220,14 +220,14 @@ FOUNDATION_EXTERN NSString * _Nonnull const PKRevealControllerCastsShadowKey;
  
  @param leftViewController Thew new left view controller.
  */
-- (void)setLeftViewController:(UIViewController * _Nonnull)leftViewController;
+- (void)setLeftViewController:(UIViewController * _Nullable)leftViewController;
 
 /**
  Exchanges the current right view controller for a new one.
  
  @param rightViewController Thew new right view controller.
  */
-- (void)setRightViewController:(UIViewController * _Nonnull)rightViewController;
+- (void)setRightViewController:(UIViewController * _Nullable)rightViewController;
 
 /**
  Adjusts the minimum and maximum reveal width of any given view controller's view.
