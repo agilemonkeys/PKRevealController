@@ -51,6 +51,7 @@ NSString * const PKRevealControllerDisablesFrontViewInteractionKey = @"disablesF
 NSString * const PKRevealControllerRecognizesPanningOnFrontViewKey = @"recognizesPanningOnFrontView";
 NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey = @"recognizesResetTapOnFrontView";
 NSString * const PKRevealControllerRecognizesResetTapOnFrontViewInPresentationModeKey = @"recognizesResetTapOnFrontViewInPresentationMode";
+NSString * const PKReavealControllerCastsShadowKey = @"castsShadow";
 
 static NSString *kPKRevealControllerFrontViewTranslationAnimationKey = @"frontViewTranslation";
 
@@ -495,7 +496,8 @@ typedef struct
                       PKRevealControllerDisablesFrontViewInteractionKey,
                       PKRevealControllerRecognizesPanningOnFrontViewKey,
                       PKRevealControllerRecognizesResetTapOnFrontViewKey,
-                      PKRevealControllerRecognizesResetTapOnFrontViewInPresentationModeKey];
+                      PKRevealControllerRecognizesResetTapOnFrontViewInPresentationModeKey,
+                      PKReavealControllerCastsShadowKey];
     
     return [self dictionaryWithValuesForKeys:keys];
 
@@ -574,7 +576,7 @@ typedef struct
     self.leftView.viewController = self.leftViewController;
     self.frontView.viewController = self.frontViewController;
     
-    self.frontView.shadow = YES;
+    self.frontView.shadow = self.castsShadow;
     
     self.leftView.hidden = YES;
     self.rightView.hidden = YES;
