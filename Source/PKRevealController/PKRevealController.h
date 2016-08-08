@@ -52,15 +52,15 @@ typedef enum : NSUInteger
 
 typedef void(^PKDefaultCompletionHandler)(BOOL finished);
 
-FOUNDATION_EXTERN NSString * const PKRevealControllerAnimationDurationKey;
-FOUNDATION_EXTERN NSString * const PKRevealControllerAnimationCurveKey;
-FOUNDATION_EXTERN NSString * const PKRevealControllerAnimationTypeKey;
-FOUNDATION_EXTERN NSString * const PKRevealControllerAllowsOverdrawKey;
-FOUNDATION_EXTERN NSString * const PKRevealControllerQuickSwipeToggleVelocityKey;
-FOUNDATION_EXTERN NSString * const PKRevealControllerDisablesFrontViewInteractionKey;
-FOUNDATION_EXTERN NSString * const PKRevealControllerRecognizesPanningOnFrontViewKey;
-FOUNDATION_EXTERN NSString * const PKRevealControllerRecognizesResetTapOnFrontViewKey;
-FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
+FOUNDATION_EXTERN NSString * _Nonnull const PKRevealControllerAnimationDurationKey;
+FOUNDATION_EXTERN NSString * _Nonnull const PKRevealControllerAnimationCurveKey;
+FOUNDATION_EXTERN NSString * _Nonnull const PKRevealControllerAnimationTypeKey;
+FOUNDATION_EXTERN NSString * _Nonnull const PKRevealControllerAllowsOverdrawKey;
+FOUNDATION_EXTERN NSString * _Nonnull const PKRevealControllerQuickSwipeToggleVelocityKey;
+FOUNDATION_EXTERN NSString * _Nonnull const PKRevealControllerDisablesFrontViewInteractionKey;
+FOUNDATION_EXTERN NSString * _Nonnull const PKRevealControllerRecognizesPanningOnFrontViewKey;
+FOUNDATION_EXTERN NSString * _Nonnull const PKRevealControllerRecognizesResetTapOnFrontViewKey;
+FOUNDATION_EXTERN NSString * _Nonnull const PKRevealControllerCastsShadowKey;
 
 @protocol PKRevealing;
 
@@ -68,19 +68,19 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
 
 #pragma mark - Properties
 /// The view controller displayed on top of the left and right ones.
-@property (nonatomic, readwrite, weak) UIViewController *frontViewController;
+@property (nullable, nonatomic, readwrite, weak) UIViewController *frontViewController;
 
 /// The view controller on the left.
-@property (nonatomic, readwrite, weak) UIViewController *leftViewController;
+@property (nullable, nonatomic, readwrite, weak) UIViewController *leftViewController;
 
 /// The view controller on the right.
-@property (nonatomic, readwrite, weak) UIViewController *rightViewController;
+@property (nullable, nonatomic, readwrite, weak) UIViewController *rightViewController;
 
 /// The gesture recognizer that is used to enable pan based reveal. By default this recognizer is added to the front view's container. Inactive and at your disposal if front view panning is disabled.
-@property (nonatomic, readonly) UIPanGestureRecognizer *revealPanGestureRecognizer;
+@property (nonnull, nonatomic, readonly) UIPanGestureRecognizer *revealPanGestureRecognizer;
 
 /// The gesture recognizer that is used to enable snap-back-on-tap if a rear view is shown and the user taps on the front view. By default this recognizer is added to the front view's container. Inactive and at your disposal if front view tapping is disabled.
-@property (nonatomic, readonly) UITapGestureRecognizer *revealResetTapGestureRecognizer;
+@property (nonnull, nonatomic, readonly) UITapGestureRecognizer *revealResetTapGestureRecognizer;
 
 /// The controllers current state. **Observable.**
 @property (nonatomic, readonly) PKRevealControllerState state;
@@ -95,7 +95,7 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
 @property (nonatomic, assign) BOOL castsShadow;
 
 /// Contains the controllers configuration. Deprecated in favour of direct property manipulation.
-@property (nonatomic, readonly) NSDictionary *options __deprecated;
+@property (nullable, nonatomic, readonly) NSDictionary *options __deprecated;
 
 /// The controllers automatic reveal animation duration. Defaults to 0.185.
 @property (nonatomic, assign, readwrite) CGFloat animationDuration;
@@ -125,7 +125,7 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
 @property (nonatomic, assign, readwrite) BOOL recognizesResetTapOnFrontViewInPresentationMode;
 
 /// The controller's delegate, conforming to the PKRevealing protocol.
-@property (nonatomic, weak, readwrite) id<PKRevealing> delegate;
+@property (nullable, nonatomic, weak, readwrite) id<PKRevealing> delegate;
 
 #pragma mark - Methods
 /**
@@ -135,9 +135,9 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
  @param leftViewController The view controller on the left.
  @param rightViewController The view controller on the right.
  */
-+ (instancetype)revealControllerWithFrontViewController:(UIViewController *)frontViewController
-                                     leftViewController:(UIViewController *)leftViewController
-                                    rightViewController:(UIViewController *)rightViewController;
++ (_Nonnull instancetype)revealControllerWithFrontViewController:(UIViewController * _Nullable)frontViewController
+                                              leftViewController:(UIViewController * _Nullable)leftViewController
+                                             rightViewController:(UIViewController * _Nullable)rightViewController;
 
 /**
  Convenience initializer. Use if only left rear views is used.
@@ -145,8 +145,8 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
  @param frontViewController The view controller displayed on top of the left and right ones.
  @param leftViewController The view controller on the left.
  */
-+ (instancetype)revealControllerWithFrontViewController:(UIViewController *)frontViewController
-                                     leftViewController:(UIViewController *)leftViewController;
++ (_Nonnull instancetype)revealControllerWithFrontViewController:(UIViewController * _Nullable)frontViewController
+                                              leftViewController:(UIViewController * _Nullable)leftViewController;
 
 /**
  Convenience initializer. Use if only right rear views is used.
@@ -154,15 +154,15 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
  @param frontViewController The view controller displayed on top of the left and right ones.
  @param rightViewController The view controller on the right.
  */
-+ (instancetype)revealControllerWithFrontViewController:(UIViewController *)frontViewController
-                                    rightViewController:(UIViewController *)rightViewController;
++ (_Nonnull instancetype)revealControllerWithFrontViewController:(UIViewController * _Nullable)frontViewController
+                                             rightViewController:(UIViewController * _Nullable)rightViewController;
 
 /**
  Shifts the front view to the position that's best suited to present the desired controller's view. (Animates by default)
  
  @param controller This is either the left or the right view controller (if present - respectively).
  */
-- (void)showViewController:(UIViewController *)controller;
+- (void)showViewController:(UIViewController * _Nullable)controller;
 
 /**
  Shifts the front view to the position that's best suited to present the desired controller's view.
@@ -171,9 +171,9 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
  @param animated Whether the position adjustments should be animated or not.
  @param completion Executed on the main thread after the show animation is completed.
  */
-- (void)showViewController:(UIViewController *)controller
+- (void)showViewController:(UIViewController * _Nullable)controller
                   animated:(BOOL)animated
-                completion:(PKDefaultCompletionHandler)completion;
+                completion:(PKDefaultCompletionHandler _Nullable)completion;
 
 /**
  Takes the currently active controller and enters presentation mode, thereby revealing the maximum width of the view.
@@ -182,7 +182,7 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
  @param completion Executed on the main thread after the show animation is completed.
  */
 - (void)enterPresentationModeAnimated:(BOOL)animated
-                           completion:(PKDefaultCompletionHandler)completion;
+                           completion:(PKDefaultCompletionHandler _Nullable)completion;
 
 /**
  If active, this method will resign the presentation mode.
@@ -193,14 +193,14 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
  */
 - (void)resignPresentationModeEntirely:(BOOL)entirely
                               animated:(BOOL)animated
-                            completion:(PKDefaultCompletionHandler)completion;
+                            completion:(PKDefaultCompletionHandler _Nullable)completion;
 
 /**
  Exchanges the current front view controller for a new one.
  
  @param frontViewController Thew new front view controller.
  */
-- (void)setFrontViewController:(UIViewController *)frontViewController;
+- (void)setFrontViewController:(UIViewController * _Nullable)frontViewController;
 
 /**
  Exchanges the current front view controller for a new one.
@@ -211,23 +211,23 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
  @param focus Whether the front view controller's view animates back to its center position after it was set.
  @param completion Executed on the main thread after the show animation is completed.
  */
-- (void)setFrontViewController:(UIViewController *)frontViewController
+- (void)setFrontViewController:(UIViewController * _Nullable)frontViewController
               focusAfterChange:(BOOL)focus
-                    completion:(PKDefaultCompletionHandler)completion __deprecated;
+                    completion:(PKDefaultCompletionHandler _Nullable)completion __deprecated;
 
 /**
  Exchanges the current left view controller for a new one.
  
  @param leftViewController Thew new left view controller.
  */
-- (void)setLeftViewController:(UIViewController *)leftViewController;
+- (void)setLeftViewController:(UIViewController * _Nullable)leftViewController;
 
 /**
  Exchanges the current right view controller for a new one.
  
  @param rightViewController Thew new right view controller.
  */
-- (void)setRightViewController:(UIViewController *)rightViewController;
+- (void)setRightViewController:(UIViewController * _Nullable)rightViewController;
 
 /**
  Adjusts the minimum and maximum reveal width of any given view controller's view.
@@ -238,12 +238,12 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
  */
 - (void)setMinimumWidth:(CGFloat)minWidth
            maximumWidth:(CGFloat)maxWidth
-      forViewController:(UIViewController *)controller;
+      forViewController:(UIViewController * _Nonnull)controller;
 
 /**
  @return Returns the currently focused controller, i.e. the one that's most prominent at any given point in time.
  */
-- (UIViewController *)focusedController;
+- (UIViewController * _Nonnull)focusedController;
 
 /**
  @return Returns YES if the reveal controller has a right side, NO otherwise.
@@ -270,7 +270,8 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
  @param revealController The controller for which the state change will occur.
  @param state The state the controller will change to.
  */
-- (void)revealController:(PKRevealController *)revealController willChangeToState:(PKRevealControllerState)state;
+- (void)revealController:(PKRevealController * _Nonnull)revealController
+       willChangeToState:(PKRevealControllerState)state;
 
 /**
  Implement this method to be notified whenever a state change DID occur. I.e. this method is called whenever the user did change from showing the front view to revealing the left view etc.
@@ -280,7 +281,8 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
  @param revealController The controller for which the state change did occur.
  @param state The state the controller did change to.
  */
-- (void)revealController:(PKRevealController *)revealController didChangeToState:(PKRevealControllerState)state;
+- (void)revealController:(PKRevealController * _Nonnull)revealController
+        didChangeToState:(PKRevealControllerState)state;
 
 @end
 
@@ -288,30 +290,30 @@ FOUNDATION_EXTERN NSString * const PKRevealControllerCastsShadowKey;
 
 @interface PKRevealController (Deprecated)
 
-+ (instancetype)revealControllerWithFrontViewController:(UIViewController *)frontViewController
-                                     leftViewController:(UIViewController *)leftViewController
-                                    rightViewController:(UIViewController *)rightViewController
-                                                options:(NSDictionary *)options __attribute__((deprecated("Use +revealControllerWithFrontViewController:leftViewController:rightViewController: instead. Set options using the options property.")));
++ (_Nonnull instancetype)revealControllerWithFrontViewController:(UIViewController * _Nullable)frontViewController
+                                     leftViewController:(UIViewController * _Nullable)leftViewController
+                                    rightViewController:(UIViewController * _Nullable)rightViewController
+                                                options:(NSDictionary * _Nullable)options __attribute__((deprecated("Use +revealControllerWithFrontViewController:leftViewController:rightViewController: instead. Set options using the options property.")));
 
-+ (instancetype)revealControllerWithFrontViewController:(UIViewController *)frontViewController
-                                     leftViewController:(UIViewController *)leftViewController
-                                                options:(NSDictionary *)options __attribute__((deprecated("Use +revealControllerWithFrontViewController:leftViewController: instead. Set options using the options property.")));
++ (_Nonnull instancetype)revealControllerWithFrontViewController:(UIViewController * _Nullable)frontViewController
+                                     leftViewController:(UIViewController * _Nullable)leftViewController
+                                                options:(NSDictionary * _Nullable)options __attribute__((deprecated("Use +revealControllerWithFrontViewController:leftViewController: instead. Set options using the options property.")));
 
-+ (instancetype)revealControllerWithFrontViewController:(UIViewController *)frontViewController
-                                    rightViewController:(UIViewController *)rightViewController
-                                                options:(NSDictionary *)options __attribute__((deprecated("Use +revealControllerWithFrontViewController:rightViewController: instead. Set options using the options property.")));
++ (_Nonnull instancetype)revealControllerWithFrontViewController:(UIViewController * _Nullable)frontViewController
+                                    rightViewController:(UIViewController * _Nullable)rightViewController
+                                                options:(NSDictionary * _Nullable)options __attribute__((deprecated("Use +revealControllerWithFrontViewController:rightViewController: instead. Set options using the options property.")));
 
-- (instancetype)initWithFrontViewController:(UIViewController *)frontViewController
-                         leftViewController:(UIViewController *)leftViewController
-                        rightViewController:(UIViewController *)rightViewController
-                                    options:(NSDictionary *)options __attribute__((deprecated("Use +revealControllerWithFrontViewController:leftViewController:rightViewController: instead. Set options using the options property.")));
+- (_Nonnull instancetype)initWithFrontViewController:(UIViewController * _Nullable)frontViewController
+                         leftViewController:(UIViewController * _Nullable)leftViewController
+                        rightViewController:(UIViewController * _Nullable)rightViewController
+                                    options:(NSDictionary * _Nullable)options __attribute__((deprecated("Use +revealControllerWithFrontViewController:leftViewController:rightViewController: instead. Set options using the options property.")));
 
-- (instancetype)initWithFrontViewController:(UIViewController *)frontViewController
-                         leftViewController:(UIViewController *)leftViewController
-                                    options:(NSDictionary *)options __attribute__((deprecated("Use +revealControllerWithFrontViewController:leftViewController: instead. Set options using the options property.")));
+- (_Nonnull instancetype)initWithFrontViewController:(UIViewController * _Nullable)frontViewController
+                         leftViewController:(UIViewController * _Nullable)leftViewController
+                                    options:(NSDictionary * _Nullable)options __attribute__((deprecated("Use +revealControllerWithFrontViewController:leftViewController: instead. Set options using the options property.")));
 
-- (instancetype)initWithFrontViewController:(UIViewController *)frontViewController
-                        rightViewController:(UIViewController *)rightViewController
-                                    options:(NSDictionary *)options __attribute__((deprecated("Use +revealControllerWithFrontViewController:rightViewController: instead. Set options using the options property.")));
+- (_Nonnull instancetype)initWithFrontViewController:(UIViewController * _Nullable)frontViewController
+                        rightViewController:(UIViewController * _Nullable)rightViewController
+                                    options:(NSDictionary * _Nullable)options __attribute__((deprecated("Use +revealControllerWithFrontViewController:rightViewController: instead. Set options using the options property.")));
 
 @end
