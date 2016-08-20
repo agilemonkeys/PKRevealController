@@ -62,16 +62,23 @@ typedef struct
     CGPoint currentTouchPoint;
 } UIGestureRecognizerInteractionFlags;
 
+typedef enum : NSUInteger
+{
+    PKRevealControllerInteractingViewNone = 0,
+    PKRevealControllerInteractingViewRight = 1,
+    PKRevealControllerInteractingViewLeft = 2
+} PKRevealControllerInteractingView;
+
 typedef struct
 {
     UIGestureRecognizerInteractionFlags recognizerFlags;
-    CGPoint initialFrontViewPosition;
-    BOOL isInteracting;
-} PKRevealControllerFrontViewInteractionFlags;
+    CGPoint initialViewPosition;
+    PKRevealControllerInteractingView interactingView;
+} PKRevealControllerViewInteractionFlags;
 
 @interface PKRevealController()
 {
-    PKRevealControllerFrontViewInteractionFlags _frontViewInteraction;
+    PKRevealControllerViewInteractionFlags _viewInteraction;
 }
 
 #pragma mark - Properties
@@ -576,14 +583,15 @@ typedef struct
     self.leftView.viewController = self.leftViewController;
     self.frontView.viewController = self.frontViewController;
     
-    self.frontView.shadow = self.castsShadow;
+    self.leftView.shadow = self.castsShadow;
+    self.rightView.shadow = self.castsShadow;
     
     self.leftView.hidden = YES;
     self.rightView.hidden = YES;
     
+    [self.view addSubview:self.frontView];
     [self.view addSubview:self.rightView];
     [self.view addSubview:self.leftView];
-    [self.view addSubview:self.frontView];
     
     [self addViewController:self.frontViewController container:self.frontView];
     [self addViewController:self.leftViewController container:self.leftView];
@@ -593,8 +601,8 @@ typedef struct
 - (void)setContainerViewsSizes
 {
     CGRect superBounds = self.view.bounds;
-    self.leftView.frame = CGRectMake(superBounds.origin.x, superBounds.origin.y, [self leftViewMaxWidth], CGRectGetHeight(superBounds));
-    self.rightView.frame = CGRectMake(superBounds.origin.x, superBounds.origin.y, [self rightViewMaxWidth], CGRectGetHeight(superBounds));
+    self.leftView.frame = CGRectMake(superBounds.origin.x - [self leftViewMaxWidth], superBounds.origin.y, [self leftViewMaxWidth], CGRectGetHeight(superBounds));
+    self.rightView.frame = CGRectMake(2 * superBounds.origin.x, superBounds.origin.y, [self rightViewMaxWidth], CGRectGetHeight(superBounds));
     self.frontView.frame = superBounds;
 }
 
@@ -609,7 +617,7 @@ typedef struct
                                                                                    action:@selector(didRecognizeTapGesture:)];
     
     [self updatePanGestureRecognizerPresence];
-    [self updateTapGestureRecognizerPrecence];
+    [self updateTapGestureRecognizerPresence];
 }
 
 - (void)setRecognizesResetTapOnFrontViewInPresentationMode:(BOOL)recognizesResetTapOnFrontViewInPresentationMode
@@ -617,7 +625,7 @@ typedef struct
     if (_recognizesResetTapOnFrontViewInPresentationMode != recognizesResetTapOnFrontViewInPresentationMode)
     {
         _recognizesResetTapOnFrontViewInPresentationMode = recognizesResetTapOnFrontViewInPresentationMode;
-        [self updateTapGestureRecognizerPrecence];
+        [self updateTapGestureRecognizerPresence];
     }
 }
 
@@ -626,7 +634,7 @@ typedef struct
     if (_recognizesResetTapOnFrontView != recognizesResetTapOnFrontView)
     {
         _recognizesResetTapOnFrontView = recognizesResetTapOnFrontView;
-        [self updateTapGestureRecognizerPrecence];
+        [self updateTapGestureRecognizerPresence];
     }
 }
 
@@ -645,7 +653,7 @@ typedef struct
 {
     [super viewDidLoad];
     
-    _state = PKRevealControllerShowsFrontViewController;
+    self.state = PKRevealControllerShowsFrontViewController;
     
     [self setupContainerViews];
     [self setupGestureRecognizers];
@@ -675,14 +683,14 @@ typedef struct
             
         default:
         {
-            // Fail quitely.
-        }
+            // Fail quietly.
             break;
+        }
     }
     
     if ([controller respondsToSelector:@selector(preferredStatusBarStyle)])
     {
-        return [controller preferredStatusBarStyle];
+        return controller.preferredStatusBarStyle;
     }
     
     return UIStatusBarStyleDefault;
@@ -748,18 +756,28 @@ typedef struct
 {
     [self.animator stopAnimationForKey:kPKRevealControllerFrontViewTranslationAnimationKey];
     
-    _frontViewInteraction.recognizerFlags.initialTouchPoint = [recognizer translationInView:self.frontView];
-    _frontViewInteraction.recognizerFlags.previousTouchPoint = _frontViewInteraction.recognizerFlags.initialTouchPoint;
-    _frontViewInteraction.initialFrontViewPosition = self.frontView.layer.position;
-    _frontViewInteraction.isInteracting = YES;
+    CGPoint translation = [recognizer translationInView:self.frontView];
+    _viewInteraction.recognizerFlags.initialTouchPoint = translation;
+    _viewInteraction.recognizerFlags.previousTouchPoint = _viewInteraction.recognizerFlags.initialTouchPoint;
+    
+    if (translation.x > CGRectGetMidX(self.frontView.bounds))
+    {
+        _viewInteraction.initialViewPosition = self.rightView.layer.position;
+        _viewInteraction.interactingView = PKRevealControllerInteractingViewRight;
+    }
+    else
+    {
+        _viewInteraction.initialViewPosition = self.leftView.layer.position;
+        _viewInteraction.interactingView = PKRevealControllerInteractingViewLeft;
+    }
     
     [self updateRearViewVisibility];
 }
 
 - (void)handlePanGestureChangedWithRecognizer:(UIPanGestureRecognizer *)recognizer
 {
-    _frontViewInteraction.recognizerFlags.currentTouchPoint = [recognizer translationInView:self.frontView];
-    CGFloat newX = _frontViewInteraction.initialFrontViewPosition.x + (_frontViewInteraction.recognizerFlags.initialTouchPoint.x + _frontViewInteraction.recognizerFlags.currentTouchPoint.x);
+    _viewInteraction.recognizerFlags.currentTouchPoint = [recognizer translationInView:self.frontView];
+    CGFloat newX = _viewInteraction.initialViewPosition.x + (_viewInteraction.recognizerFlags.initialTouchPoint.x + _viewInteraction.recognizerFlags.currentTouchPoint.x);
     
     if (![self hasLeftViewController] && newX >= [self centerPointForState:PKRevealControllerShowsFrontViewController].x)
     {
@@ -797,52 +815,32 @@ typedef struct
     self.frontView.layer.position = CGPointMake(newX, self.frontView.layer.position.y);
     [self updateRearViewVisibility];
     
-    _frontViewInteraction.recognizerFlags.previousTouchPoint = _frontViewInteraction.recognizerFlags.currentTouchPoint;
+    _viewInteraction.recognizerFlags.previousTouchPoint = _viewInteraction.recognizerFlags.currentTouchPoint;
 }
 
 - (void)handlePanGestureEndedWithRecognizer:(UIPanGestureRecognizer *)recognizer
 {
-    _frontViewInteraction.recognizerFlags.initialTouchPoint = CGPointZero;
-    _frontViewInteraction.recognizerFlags.previousTouchPoint = CGPointZero;
-    _frontViewInteraction.recognizerFlags.currentTouchPoint = CGPointZero;
-    _frontViewInteraction.initialFrontViewPosition = CGPointZero;
-    _frontViewInteraction.isInteracting = NO;
+    _viewInteraction.recognizerFlags.initialTouchPoint = CGPointZero;
+    _viewInteraction.recognizerFlags.previousTouchPoint = CGPointZero;
+    _viewInteraction.recognizerFlags.currentTouchPoint = CGPointZero;
+    _viewInteraction.initialViewPosition = CGPointZero;
+    _viewInteraction.interactingView = PKRevealControllerInteractingViewNone;
     
-    if ([self shouldMoveFrontViewLeftwardsForVelocity:[recognizer velocityInView:self.view].x])
+    if ([self shouldMoveRightViewLeftwardsForVelocity:[recognizer velocityInView:self.view].x])
     {
-        PKRevealControllerState toState = PKRevealControllerShowsFrontViewController;
-        
-        if (self.state == PKRevealControllerShowsRightViewController ||
-            self.state == PKRevealControllerShowsRightViewControllerInPresentationMode)
-        {
-            toState = self.state;
-        }
-        else if (self.state == PKRevealControllerShowsFrontViewController && [self hasRightViewController])
-        {
-            toState = PKRevealControllerShowsRightViewController;
-        }
+        PKRevealControllerState toState = PKRevealControllerShowsRightViewController;
         
         [self animateToState:toState completion:nil];
     }
-    else if ([self shouldMoveFrontViewRightwardsForVelocity:[recognizer velocityInView:self.frontView].x])
+    else if ([self shouldMoveLeftViewRightwardsForVelocity:[recognizer velocityInView:self.frontView].x])
     {
-        PKRevealControllerState toState = PKRevealControllerShowsFrontViewController;
-        
-        if (self.state == PKRevealControllerShowsFrontViewController && [self hasLeftViewController])
-        {
-            toState = PKRevealControllerShowsLeftViewController;
-        }
-        else if (self.state == PKRevealControllerShowsLeftViewController ||
-                 self.state == PKRevealControllerShowsLeftViewControllerInPresentationMode)
-        {
-            toState = self.state;
-        }
+        PKRevealControllerState toState = PKRevealControllerShowsLeftViewController;
         
         [self animateToState:toState completion:nil];
     }
     else
     {
-        [self snapFrontViewToAppropriateEdge];
+        [self snapViewsToAppropriateEdge];
     }
 }
 
@@ -967,7 +965,7 @@ typedef struct
     self.state = [self stateForCurrentFrontViewPosition];
 }
 
-- (void)updateTapGestureRecognizerPrecence
+- (void)updateTapGestureRecognizerPresence
 {
     if ((self.state == PKRevealControllerShowsRightViewControllerInPresentationMode ||
         self.state == PKRevealControllerShowsLeftViewControllerInPresentationMode) &&
@@ -1043,25 +1041,24 @@ typedef struct
 
 - (BOOL)isLeftViewVisible
 {
-    CALayer *layer = [self frontViewLayer];
-    return (layer.position.x > CGRectGetMidX(self.view.bounds));
+    CALayer *layer = [self leftViewLayer];
+    return (layer.position.x > CGRectGetMidX(self.leftView.bounds));
 }
 
 - (BOOL)isRightViewVisible
 {
-    CALayer *layer = [self frontViewLayer];
-    return (layer.position.x < CGRectGetMidX(self.view.bounds));
+    CALayer *layer = [self rightViewLayer];
+    return (layer.position.x < CGRectGetMidX(self.rightView.bounds));
 }
 
-- (void)snapFrontViewToAppropriateEdge
+- (void)snapViewsToAppropriateEdge
 {
     CGFloat visibleWidth = 0.0;
-    
     PKRevealControllerState toState = PKRevealControllerShowsFrontViewController;
     
     if ([self isLeftViewVisible])
     {
-        visibleWidth = self.frontView.layer.position.x - self.leftView.layer.position.x;
+        visibleWidth = self.leftView.layer.position.x - self.frontView.layer.position.x;
         
         if (visibleWidth > ([self leftViewMinWidth] / 2.0))
         {
@@ -1070,7 +1067,7 @@ typedef struct
     }
     else if ([self isRightViewVisible])
     {
-        visibleWidth = self.rightView.layer.position.x - self.frontView.layer.position.x;
+        visibleWidth = self.frontView.layer.position.x - self.rightView.layer.position.x;
         
         if (visibleWidth > ([self rightViewMinWidth] / 2.0))
         {
@@ -1081,12 +1078,12 @@ typedef struct
     [self animateToState:toState completion:nil];
 }
 
-- (BOOL)shouldMoveFrontViewRightwardsForVelocity:(CGFloat)velocity
+- (BOOL)shouldMoveLeftViewRightwardsForVelocity:(CGFloat)velocity
 {
     return (velocity > 0 && velocity > self.quickSwipeVelocity);
 }
 
-- (BOOL)shouldMoveFrontViewLeftwardsForVelocity:(CGFloat)velocity
+- (BOOL)shouldMoveRightViewLeftwardsForVelocity:(CGFloat)velocity
 {
     return (velocity < 0 && fabs(velocity) > self.quickSwipeVelocity);
 }
@@ -1152,7 +1149,7 @@ typedef struct
             [weakSelf updateRearViewVisibility];
         }
         
-        [weakSelf updateTapGestureRecognizerPrecence];
+        [weakSelf updateTapGestureRecognizerPresence];
         [weakSelf updatePanGestureRecognizerPresence];
         
         [weakSelf pk_performBlock:^
@@ -1313,7 +1310,7 @@ typedef struct
         [(CALayer *)[self.frontView.layer presentationLayer] setPosition:toPoint];
         
         [self updateRearViewVisibility];
-        [self updateTapGestureRecognizerPrecence];
+        [self updateTapGestureRecognizerPresence];
         [self updatePanGestureRecognizerPresence];
         
         [self pk_performBlock:^
@@ -1326,9 +1323,14 @@ typedef struct
     }
 }
 
-- (CALayer *)frontViewLayer
+- (CALayer *)rightViewLayer
 {
-    return [self.frontView.layer presentationLayer] ?: self.frontView.layer;
+    return [self.rightView.layer presentationLayer] ?: self.rightView.layer;
+}
+
+- (CALayer *)leftViewLayer
+{
+    return [self.leftView.layer presentationLayer] ?: self.leftView.layer;
 }
 
 #pragma mark - Positioning & Sizing
@@ -1347,25 +1349,25 @@ typedef struct
             
         case PKRevealControllerShowsLeftViewController:
         {
-            center.x = CGRectGetMidX(self.view.bounds) + [self leftViewMinWidth];
+            center.x = [self leftViewMinWidth] / 2.0;
         }
             break;
             
         case PKRevealControllerShowsRightViewController:
         {
-            center.x = CGRectGetMidX(self.view.bounds) - [self rightViewMinWidth];
+            center.x = CGRectGetMaxX(self.view.bounds) - [self rightViewMinWidth] / 2.0;
         }
             break;
             
         case PKRevealControllerShowsLeftViewControllerInPresentationMode:
         {
-            center.x = CGRectGetMidX(self.view.bounds) + [self leftViewMaxWidth];
+            center.x = [self leftViewMaxWidth] / 2.0;
         }
             break;
             
         case PKRevealControllerShowsRightViewControllerInPresentationMode:
         {
-            center.x = CGRectGetMidX(self.view.bounds) - [self rightViewMaxWidth];
+            center.x = CGRectGetMaxX(self.view.bounds) - [self rightViewMaxWidth] / 2.0;
         }
     }
     
@@ -1400,7 +1402,7 @@ typedef struct
  */
 - (BOOL)shouldAutorotate
 {
-    if (_frontViewInteraction.isInteracting)
+    if (_viewInteraction.interactingView != PKRevealControllerInteractingViewNone)
     {
         return NO;
     }
@@ -1452,7 +1454,7 @@ typedef struct
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
 {
-    if (_frontViewInteraction.isInteracting)
+    if (_viewInteraction.interactingView != PKRevealControllerInteractingViewNone)
     {
         return NO;
     }

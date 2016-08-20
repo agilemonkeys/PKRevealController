@@ -91,7 +91,7 @@ FOUNDATION_EXTERN NSString * _Nonnull const PKRevealControllerCastsShadowKey;
 /// Returns YES if either the left or right view controller are revealed to their max width.
 @property (nonatomic, readonly) BOOL isPresentationModeActive;
 
-/// Whether to allow the front controller to cast a shadow
+/// Whether to allow the side controllers to cast a shadow
 @property (nonatomic, assign) BOOL castsShadow;
 
 /// Contains the controllers configuration. Deprecated in favour of direct property manipulation.
