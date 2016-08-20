@@ -31,6 +31,9 @@
 
 static NSString *kShadowTransitionAnimationKey = @"shadowTransitionAnimation";
 
+@interface PKRevealControllerView () <CAAnimationDelegate>
+@end
+
 @implementation PKRevealControllerView
 
 #pragma mark - Accessors

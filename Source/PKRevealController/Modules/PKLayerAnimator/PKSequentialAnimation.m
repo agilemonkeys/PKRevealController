@@ -27,7 +27,7 @@
 #import "PKSequentialAnimation.h"
 #import "NSObject+PKBlocks.h"
 
-@interface PKSequentialAnimation ()
+@interface PKSequentialAnimation () <CAAnimationDelegate>
 
 #pragma mark - Properties
 @property (nonatomic, strong, readwrite) NSArray *animations;

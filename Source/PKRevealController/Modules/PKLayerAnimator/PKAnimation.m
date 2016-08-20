@@ -28,6 +28,9 @@
 #import "NSObject+PKBlocks.h"
 #import "PKLog.h"
 
+@interface PKAnimation () <CAAnimationDelegate>
+@end
+
 @implementation PKAnimation
 
 @synthesize layer = _layer;
